@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using static System.Net.Mime.MediaTypeNames;
+using ImageUploaderAPI.Models;
 
 namespace ImageUploaderAPI.Data
 {
@@ -9,5 +9,7 @@ namespace ImageUploaderAPI.Data
             : base(options)
         {
         }
+
+        public DbSet<Image> Images { get; set; } = null!;
     }
 }
