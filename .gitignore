@@ -1,0 +1,102 @@
+# -----------------------------
+# .NET / Visual Studio Files
+# -----------------------------
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio 2019 cache/options directory
+.vs/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NuGet Packages
+*.nupkg
+**/packages/*
+#!**/packages/build/
+#!**/packages/repositories.config
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# VS Code settings
+.vscode/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# DotNetCore generated files
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Others
+*.log
+
+# -----------------------------
+# React / Node.js Files
+# -----------------------------
+
+# Dependencies
+node_modules/
+
+# Build outputs
+build/
+dist/
+
+# Cache directories
+.cache/
+.npm/
+.yarn/
+
+# Optional npm cache directory
+.npm
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Optional REACT_DEBUG_LOG file
+REACT_DEBUG_LOG*
+
+# Parcel-bundler cache (if you use it)
+.cache/
+
+# Next.js build output (if using Next.js)
+.next/
+
+# Nuxt.js build / generate output
+.nuxt/
+dist/
+
+# Gatsby files
+.cache/
+public/

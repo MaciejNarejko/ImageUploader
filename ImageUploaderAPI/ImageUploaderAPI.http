@@ -1,0 +1,5 @@
+@ImageUploaderAPI_HostAddress = http://localhost:5182
+
+GET {{ImageUploaderAPI_HostAddress}}/api/images
+Accept: application/json
+###
