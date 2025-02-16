@@ -1,0 +1,159 @@
+import React, { useState, useRef, useEffect } from 'react'
+import styled from 'styled-components'
+
+export interface ImageData {
+	filePath: string
+	fileName: string
+	uploadDate: string
+	resolution: string
+}
+
+interface ImageItemProps {
+	image: ImageData
+	onDownload: (image: ImageData) => void
+	onDelete: (image: ImageData) => void
+}
+
+const ImageItem: React.FC<ImageItemProps> = ({ image, onDownload, onDelete }) => {
+	const [dropdownOpen, setDropdownOpen] = useState(false)
+	const dropdownRef = useRef<HTMLDivElement>(null)
+
+	const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation()
+		setDropdownOpen(prev => !prev)
+	}
+
+	useEffect(() => {
+		const handleClickOutside = (e: MouseEvent) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+				setDropdownOpen(false)
+			}
+		}
+		document.addEventListener('mousedown', handleClickOutside)
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside)
+		}
+	}, [])
+
+	return (
+		<GalleryItem>
+			<Thumbnail src={image.filePath} alt={image.fileName} />
+			<FileInfo>
+				<FileName>{image.fileName}</FileName>
+				<FileDate>Uploaded: {new Date(image.uploadDate).toLocaleString()}</FileDate>
+				<FileRes>Resolution: {image.resolution}</FileRes>
+			</FileInfo>
+			<Dropdown ref={dropdownRef}>
+				<DropdownToggle onClick={handleToggle}>...</DropdownToggle>
+				{dropdownOpen && (
+					<DropdownMenu>
+						<DropdownButton
+							onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+								e.stopPropagation()
+								onDownload(image)
+								setDropdownOpen(false)
+							}}>
+							Download
+						</DropdownButton>
+						<DropdownButton
+							onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+								e.stopPropagation()
+								onDelete(image)
+								setDropdownOpen(false)
+							}}>
+							Delete
+						</DropdownButton>
+					</DropdownMenu>
+				)}
+			</Dropdown>
+		</GalleryItem>
+	)
+}
+
+export default ImageItem
+
+const GalleryItem = styled.div`
+	display: flex;
+	align-items: stretch;
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	transition: transform 0.3s;
+	padding: 10px;
+	margin-bottom: 10px;
+
+	&:hover {
+		transform: scale(1.02);
+	}
+`
+
+const Thumbnail = styled.img`
+	width: 80px;
+	height: 80px;
+	object-fit: cover;
+	border-radius: 8px;
+	margin-right: 15px;
+	flex-shrink: 0;
+`
+
+const FileInfo = styled.div`
+	flex-grow: 1;
+`
+
+const FileName = styled.p`
+	margin: 3px 0;
+	font-size: 0.95em;
+	font-weight: 500;
+`
+
+const FileDate = styled.p`
+	margin: 3px 0;
+	font-size: 0.85em;
+	color: #666;
+`
+
+const FileRes = styled.p`
+	margin: 3px 0;
+	font-size: 0.85em;
+	color: #666;
+`
+
+const Dropdown = styled.div`
+	position: relative;
+	display: inline-block;
+`
+
+const DropdownToggle = styled.button`
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	font-size: 1.5em;
+	padding: 0 5px;
+	line-height: 0;
+`
+
+const DropdownMenu = styled.div`
+	position: absolute;
+	right: 0;
+	background: #fff;
+	min-width: 120px;
+	border: 1px solid #ddd;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	z-index: 100;
+	border-radius: 8px;
+`
+
+const DropdownButton = styled.button`
+	width: 100%;
+	background: none;
+	border: none;
+	padding: 8px 10px;
+	text-align: left;
+	cursor: pointer;
+	font-size: 0.9em;
+
+	&:hover {
+		background: #007bff;
+		color: #fff;
+	}
+`
