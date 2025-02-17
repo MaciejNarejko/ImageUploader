@@ -1,17 +1,7 @@
-import React from 'react'
 import styled from 'styled-components'
 import ImageItem from './ImageItem'
-
-interface GalleryProps {
-	images: ImageData[]
-}
-
-export interface ImageData {
-	fileName: string
-	filePath: string
-	uploadDate: string
-	resolution: string
-}
+import { ImageData } from '../types/imageTypes'
+import useSortedImages from '../hooks/useSortedImages'
 
 interface GalleryProps {
 	images: ImageData[]
@@ -19,30 +9,11 @@ interface GalleryProps {
 	onSortChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
 	onDownload: (image: ImageData) => void
 	onDelete: (image: ImageData) => void
+	onImageClick: (image: ImageData) => void
 }
 
-const Gallery: React.FC<GalleryProps> = ({ images, sortOption, onSortChange, onDownload, onDelete }) => {
-	const sortedImages = (images: ImageData[], sortOption: string): ImageData[] => {
-		const imgs = [...images]
-		switch (sortOption) {
-			case 'nameAsc':
-				imgs.sort((a, b) => a.fileName.localeCompare(b.fileName))
-				break
-			case 'nameDesc':
-				imgs.sort((a, b) => b.fileName.localeCompare(a.fileName))
-				break
-			case 'dateNewest':
-				imgs.sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime())
-				break
-			case 'dateOldest':
-				imgs.sort((a, b) => new Date(a.uploadDate).getTime() - new Date(b.uploadDate).getTime())
-				break
-			default:
-				imgs.sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime())
-				break
-		}
-		return imgs
-	}
+const Gallery: React.FC<GalleryProps> = ({ images, sortOption, onSortChange, onDownload, onDelete, onImageClick }) => {
+	const sortedImages = useSortedImages(images, sortOption)
 
 	return (
 		<GalleryWrapper>
@@ -57,8 +28,14 @@ const Gallery: React.FC<GalleryProps> = ({ images, sortOption, onSortChange, onD
 				</select>
 			</SortContainer>
 			<GalleryItems>
-				{sortedImages(images, sortOption).map((img, index) => (
-					<ImageItem key={index} image={img} onDownload={onDownload} onDelete={onDelete} />
+				{sortedImages.map((img, index) => (
+					<ImageItem
+						key={`${img.fileName}_${index}`}
+						image={img}
+						onDownload={onDownload}
+						onDelete={onDelete}
+						onImageClick={onImageClick}
+					/>
 				))}
 			</GalleryItems>
 		</GalleryWrapper>

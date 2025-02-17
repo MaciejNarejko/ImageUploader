@@ -1,47 +1,81 @@
-import React from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import styled from 'styled-components'
 
 interface UploadAreaProps {
-	onFileSelected: (e: React.ChangeEvent<HTMLInputElement>) => void
-	onDragOver: (e: React.DragEvent<HTMLDivElement>) => void
-	onDragLeave: (e: React.DragEvent<HTMLDivElement>) => void
-	onDrop: (e: React.DragEvent<HTMLDivElement>) => void
-	onClick: () => void
-	fileInputRef: React.RefObject<HTMLInputElement | null>
+	onFileUpload: (file: File) => void
+	isUploading: boolean
+	uploadProgress: number
 }
 
-const UploadArea: React.FC<UploadAreaProps> = ({
-	onFileSelected,
-	onDragOver,
-	onDragLeave,
-	onDrop,
-	onClick,
-	fileInputRef,
-}) => {
+const UploadArea: React.FC<UploadAreaProps> = ({ onFileUpload, isUploading, uploadProgress }) => {
+	const [isHovering, setIsHovering] = useState(false)
+	const fileInputRef = useRef<HTMLInputElement>(null)
+
+	const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files && e.target.files.length > 0) {
+			onFileUpload(e.target.files[0])
+			e.target.value = ''
+		}
+	}
+
+	const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault()
+		setIsHovering(true)
+	}
+
+	const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault()
+		setIsHovering(false)
+	}
+
+	const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault()
+		setIsHovering(false)
+		if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+			onFileUpload(e.dataTransfer.files[0])
+		}
+	}
+
+	const handleClick = useCallback(() => {
+		fileInputRef.current?.click()
+	}, [])
+
 	return (
-		<Area id='uploadArea' onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop} onClick={onClick}>
-			<HiddenInput type='file' id='fileInput' accept='image/*' onChange={onFileSelected} ref={fileInputRef} />
+		<Area
+			$isHovering={isHovering}
+			onDragOver={handleDragOver}
+			onDragLeave={handleDragLeave}
+			onDrop={handleDrop}
+			onClick={handleClick}>
+			<HiddenInput type='file' accept='image/*' ref={fileInputRef} onChange={handleFileSelected} />
 			<UploadText>Przeciągnij i upuść obrazek tutaj lub kliknij, aby wybrać</UploadText>
-			<LimitInfo> Maksymalny rozmiar pliku: 3 MB. Maksymalnie plików na serwerze: 5.</LimitInfo>
-			<FormatInfo> Dopuszczalne formaty plików: JPG, JPEG, PNG, GIF.</FormatInfo>
+			<LimitInfo>Maksymalny rozmiar pliku: 3 MB. Maksymalnie plików na serwerze: 5.</LimitInfo>
+			<FormatInfo>Dopuszczalne formaty plików: JPG, JPEG, PNG, GIF.</FormatInfo>
 			<UploadButton
 				onClick={e => {
 					e.stopPropagation()
-					onClick()
+					handleClick()
 				}}>
 				Wybierz plik
 			</UploadButton>
-			<ProgressContainer id='progressContainer'>
-				<ProgressBar id='progressBar' />
-				<ProgressText id='progressText'>0%</ProgressText>
-			</ProgressContainer>
+
+			{isUploading && (
+				<ProgressContainer>
+					<ProgressBar style={{ width: `${uploadProgress}%` }} />
+					<ProgressText>{uploadProgress}%</ProgressText>
+				</ProgressContainer>
+			)}
 		</Area>
 	)
 }
 
 export default UploadArea
 
-const Area = styled.div`
+interface AreaProps {
+	$isHovering: boolean
+}
+
+const Area = styled.div<AreaProps>`
 	border: 2px dashed #ccc;
 	border-radius: 8px;
 	padding: 40px;
@@ -49,15 +83,13 @@ const Area = styled.div`
 	transition: background 0.3s, border-color 0.3s;
 	position: relative;
 	cursor: pointer;
-
-	&.hover {
-		background: rgba(0, 123, 255, 0.1);
-		border-color: #007bff;
-	}
+	background: ${({ $isHovering }) => ($isHovering ? 'rgba(0,123,255,0.1)' : 'transparent')};
+	border-color: ${({ $isHovering }) => ($isHovering ? '#007bff' : '#ccc')};
 `
 
 const HiddenInput = styled.input`
-	display: none;
+	position: absolute;
+	left: -9999px;
 `
 
 const UploadText = styled.p`
@@ -65,6 +97,7 @@ const UploadText = styled.p`
 	margin: 0;
 	pointer-events: none;
 `
+
 const LimitInfo = styled.p`
 	margin-top: 10px;
 	font-size: 0.9rem;
@@ -103,12 +136,10 @@ const ProgressContainer = styled.div`
 	margin-top: 15px;
 	position: relative;
 	height: 20px;
-	display: none;
 `
 
 const ProgressBar = styled.div`
 	height: 100%;
-	width: 0%;
 	background-color: #007bff;
 	transition: width 0.3s;
 `

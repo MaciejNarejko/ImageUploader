@@ -1,20 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
-
-export interface ImageData {
-	filePath: string
-	fileName: string
-	uploadDate: string
-	resolution: string
-}
+import { ImageData } from '../types/imageTypes'
 
 interface ImageItemProps {
 	image: ImageData
 	onDownload: (image: ImageData) => void
 	onDelete: (image: ImageData) => void
+	onImageClick: (image: ImageData) => void
 }
 
-const ImageItem: React.FC<ImageItemProps> = ({ image, onDownload, onDelete }) => {
+const ImageItem: React.FC<ImageItemProps> = ({ image, onDownload, onDelete, onImageClick }) => {
 	const [dropdownOpen, setDropdownOpen] = useState(false)
 	const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -37,9 +32,9 @@ const ImageItem: React.FC<ImageItemProps> = ({ image, onDownload, onDelete }) =>
 
 	return (
 		<GalleryItem>
-			<Thumbnail src={image.filePath} alt={image.fileName} />
+			<Thumbnail src={image.filePath} alt={image.fileName} onClick={() => onImageClick(image)} />
 			<FileInfo>
-				<FileName>{image.fileName}</FileName>
+				<FileName onClick={() => onImageClick(image)}>{image.fileName}</FileName>
 				<FileDate>Uploaded: {new Date(image.uploadDate).toLocaleString()}</FileDate>
 				<FileRes>Resolution: {image.resolution}</FileRes>
 			</FileInfo>
@@ -94,6 +89,7 @@ const Thumbnail = styled.img`
 	border-radius: 8px;
 	margin-right: 15px;
 	flex-shrink: 0;
+	cursor: pointer;
 `
 
 const FileInfo = styled.div`
@@ -104,6 +100,11 @@ const FileName = styled.p`
 	margin: 3px 0;
 	font-size: 0.95em;
 	font-weight: 500;
+	cursor: pointer;
+	&:hover {
+		color: #007bff;
+		text-decoration: underline;
+	}
 `
 
 const FileDate = styled.p`
