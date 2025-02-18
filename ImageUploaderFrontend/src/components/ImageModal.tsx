@@ -26,7 +26,7 @@ const ImageModal: React.FC<ImageModalProps> = ({ image, onClose }) => {
 		<ModalOverlay onClick={onClose}>
 			<ModalContent onClick={e => e.stopPropagation()}>
 				<CloseButton onClick={onClose}>×</CloseButton>
-				<ModalImage src={image.filePath} alt={image.fileName} />
+				<ModalImage src={`https://localhost:7124${image.filePath}`} alt={image.fileName} />
 			</ModalContent>
 		</ModalOverlay>
 	)
@@ -73,6 +73,8 @@ const CloseButton = styled.button`
 `
 
 const ModalImage = styled.img`
+	height: auto;
+	width: auto;
 	max-width: 100%;
 	max-height: 100%;
 	object-fit: contain;

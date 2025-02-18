@@ -1,50 +1,80 @@
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import styled from 'styled-components'
-import UploadArea from './components/UploadArea'
+import axios from 'axios'
+import Layout from './components/Layout'
 import Gallery from './components/Gallery'
+import ImageModal from './components/ImageModal'
+import UploadArea from './components/UploadArea'
 import Toast from './components/Toast'
 import { ImageData } from './types/imageTypes'
-import { mockImages } from './mocs/mockData'
-import ImageModal from './components/ImageModal'
-import Layout from './components/Layout'
-import useFileUpload from './hooks/useFileUpload'
+import { useFileUpload } from './hooks/useFileUpload'
 
 function App() {
-	const [images, setImages] = useState<ImageData[]>(mockImages)
+	const [images, setImages] = useState<ImageData[]>([])
 	const [sortOption, setSortOption] = useState<string>('nameAsc')
 	const [toastMsg, setToastMsg] = useState<string>('')
 	const [selectedImage, setSelectedImage] = useState<ImageData | null>(null)
+
+	useEffect(() => {
+		const API_URL = import.meta.env.VITE_API_URL
+		fetch(`${API_URL}/api/images`)
+			.then(res => {
+				if (!res.ok) {
+					throw new Error('Failed to fetch images')
+				}
+				return res.json()
+			})
+			.then((data: ImageData[]) => setImages(data))
+			.catch(error => {
+				console.error('Error fetching images:', error)
+			})
+	}, [])
 
 	const showToast = useCallback((message: string, duration = 3000) => {
 		setToastMsg(message)
 		setTimeout(() => setToastMsg(''), duration)
 	}, [])
 
-	const handleFileUploaded = useCallback((newImage: ImageData) => {
-		setImages(prev => [...prev, newImage])
+	const handleFilesUploaded = useCallback((newImages: ImageData[]) => {
+		setImages(prev => [...prev, ...newImages])
 	}, [])
 
-	const { isUploading, uploadProgress, uploadFile } = useFileUpload({
-		onFileUploaded: handleFileUploaded,
+	const { isUploading, uploadProgress, uploadFiles } = useFileUpload({
+		onFilesUploaded: handleFilesUploaded,
 		showToast,
+		existingImages: images,
 	})
 
-	const handleDownload = useCallback((img: ImageData) => {
-		const link = document.createElement('a')
-		link.href = img.filePath
-		link.download = img.fileName
-		link.target = '_blank'
-		document.body.appendChild(link)
-		link.click()
-		document.body.removeChild(link)
+	const handleDownload = useCallback(async (img: ImageData) => {
+		const API_URL = import.meta.env.VITE_API_URL
+		const fileUrl = `${API_URL}${img.filePath}`
+
+		try {
+			const response = await axios.get(fileUrl, { responseType: 'blob' })
+			const url = window.URL.createObjectURL(new Blob([response.data]))
+			const link = document.createElement('a')
+			link.href = url
+			link.download = img.fileName
+			link.click()
+			window.URL.revokeObjectURL(url)
+		} catch (error) {
+			console.error('Error downloading file:', error)
+		}
 	}, [])
 
 	const handleDelete = useCallback(
-		(img: ImageData) => {
-			setImages(prev => prev.filter(item => item.fileName !== img.fileName))
-			showToast('Obrazek został usunięty')
+		async (img: ImageData) => {
+			const API_URL = import.meta.env.VITE_API_URL
+			try {
+				await axios.delete(`${API_URL}/api/images/${img.id}`)
+				setImages(prev => prev.filter(item => item.id !== img.id))
+				showToast('Obrazek został usunięty', 3000)
+			} catch (error) {
+				console.error('Error deleting image:', error)
+				showToast('Wystąpił błąd przy usuwaniu obrazka', 3000)
+			}
 		},
-		[showToast]
+		[setImages, showToast]
 	)
 
 	const handleSortChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -59,7 +89,7 @@ function App() {
 		<Layout>
 			<AppWrapper>
 				<AppTitle>Image Uploader - Prześlij i wyświetl!</AppTitle>
-				<UploadArea onFileUpload={uploadFile} isUploading={isUploading} uploadProgress={uploadProgress} />
+				<UploadArea onFilesUpload={uploadFiles} isUploading={isUploading} uploadProgress={uploadProgress} />
 				<Gallery
 					images={images}
 					sortOption={sortOption}

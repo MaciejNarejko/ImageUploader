@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { ImageData } from '../types/imageTypes'
 
-const useSortedImages = (images: ImageData[], sortOption: string): ImageData[] => {
+export const useSortedImages = (images: ImageData[], sortOption: string): ImageData[] => {
 	return useMemo(() => {
 		const sorted = [...images]
 		switch (sortOption) {
@@ -24,5 +24,3 @@ const useSortedImages = (images: ImageData[], sortOption: string): ImageData[] =
 		return sorted
 	}, [images, sortOption])
 }
-
-export default useSortedImages

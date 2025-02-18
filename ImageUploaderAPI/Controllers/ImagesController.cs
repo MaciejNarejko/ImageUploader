@@ -27,8 +27,8 @@ namespace ImageUploaderAPI.Controllers
                 return BadRequest("Brak przesłanych plików.");
 
             var currentCount = await _context.Images.CountAsync();
-            if (currentCount + files.Length > 5)
-                return BadRequest("Limit zdjęć na serwerze wynosi 5. Usuń niektóre zdjęcia, aby wgrać nowe.");
+            if (currentCount + files.Length > 10)
+                return BadRequest("Limit zdjęć na serwerze wynosi 10. Usuń niektóre zdjęcia, aby wgrać nowe.");
 
             var maxFileSize = 3145728; 
             var uploadsPath = Path.Combine(_env.WebRootPath, "uploads");

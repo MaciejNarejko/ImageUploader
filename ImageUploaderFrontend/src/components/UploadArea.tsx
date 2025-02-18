@@ -2,18 +2,19 @@ import React, { useState, useRef, useCallback } from 'react'
 import styled from 'styled-components'
 
 interface UploadAreaProps {
-	onFileUpload: (file: File) => void
+	onFilesUpload: (files: File[]) => void
 	isUploading: boolean
 	uploadProgress: number
 }
 
-const UploadArea: React.FC<UploadAreaProps> = ({ onFileUpload, isUploading, uploadProgress }) => {
+const UploadArea: React.FC<UploadAreaProps> = ({ onFilesUpload, isUploading, uploadProgress }) => {
 	const [isHovering, setIsHovering] = useState(false)
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
-	const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
-			onFileUpload(e.target.files[0])
+			const filesArray = Array.from(e.target.files)
+			onFilesUpload(filesArray)
 			e.target.value = ''
 		}
 	}
@@ -32,7 +33,8 @@ const UploadArea: React.FC<UploadAreaProps> = ({ onFileUpload, isUploading, uplo
 		e.preventDefault()
 		setIsHovering(false)
 		if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-			onFileUpload(e.dataTransfer.files[0])
+			const filesArray = Array.from(e.dataTransfer.files)
+			onFilesUpload(filesArray)
 		}
 	}
 
@@ -47,9 +49,9 @@ const UploadArea: React.FC<UploadAreaProps> = ({ onFileUpload, isUploading, uplo
 			onDragLeave={handleDragLeave}
 			onDrop={handleDrop}
 			onClick={handleClick}>
-			<HiddenInput type='file' accept='image/*' ref={fileInputRef} onChange={handleFileSelected} />
+			<HiddenInput type='file' accept='image/*' ref={fileInputRef} onChange={handleFilesSelected} multiple />
 			<UploadText>Przeciągnij i upuść obrazek tutaj lub kliknij, aby wybrać</UploadText>
-			<LimitInfo>Maksymalny rozmiar pliku: 3 MB. Maksymalnie plików na serwerze: 5.</LimitInfo>
+			<LimitInfo>Maksymalny rozmiar pliku: 3 MB. Maksymalnie plików na serwerze: 10</LimitInfo>
 			<FormatInfo>Dopuszczalne formaty plików: JPG, JPEG, PNG, GIF.</FormatInfo>
 			<UploadButton
 				onClick={e => {

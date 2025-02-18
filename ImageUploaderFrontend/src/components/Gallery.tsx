@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import ImageItem from './ImageItem'
 import { ImageData } from '../types/imageTypes'
-import useSortedImages from '../hooks/useSortedImages'
+import { useSortedImages } from '../hooks/useSortedImages'
 
 interface GalleryProps {
 	images: ImageData[]
@@ -28,14 +28,8 @@ const Gallery: React.FC<GalleryProps> = ({ images, sortOption, onSortChange, onD
 				</select>
 			</SortContainer>
 			<GalleryItems>
-				{sortedImages.map((img, index) => (
-					<ImageItem
-						key={`${img.fileName}_${index}`}
-						image={img}
-						onDownload={onDownload}
-						onDelete={onDelete}
-						onImageClick={onImageClick}
-					/>
+				{sortedImages.map(img => (
+					<ImageItem key={img.id} image={img} onDownload={onDownload} onDelete={onDelete} onImageClick={onImageClick} />
 				))}
 			</GalleryItems>
 		</GalleryWrapper>

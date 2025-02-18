@@ -30,13 +30,28 @@ const ImageItem: React.FC<ImageItemProps> = ({ image, onDownload, onDelete, onIm
 		}
 	}, [])
 
+	const formatFileSize = (size: number): string => {
+		if (size < 1024) return size + ' B'
+		const kb = size / 1024
+		if (kb < 1024) return kb.toFixed(1) + ' KB'
+		const mb = kb / 1024
+		return mb.toFixed(1) + ' MB'
+	}
+
 	return (
 		<GalleryItem>
-			<Thumbnail src={image.filePath} alt={image.fileName} onClick={() => onImageClick(image)} />
+			<Thumbnail
+				src={`https://localhost:7124${image.filePath}`}
+				alt={image.fileName}
+				onClick={() => onImageClick(image)}
+			/>
 			<FileInfo>
 				<FileName onClick={() => onImageClick(image)}>{image.fileName}</FileName>
 				<FileDate>Uploaded: {new Date(image.uploadDate).toLocaleString()}</FileDate>
-				<FileRes>Resolution: {image.resolution}</FileRes>
+				<FileRes>
+					Resolution: {image.width} x {image.height}
+				</FileRes>
+				<FileSize>File size: {formatFileSize(image.fileSize)}</FileSize>
 			</FileInfo>
 			<Dropdown ref={dropdownRef}>
 				<DropdownToggle onClick={handleToggle}>...</DropdownToggle>
@@ -109,13 +124,19 @@ const FileName = styled.p`
 
 const FileDate = styled.p`
 	margin: 3px 0;
-	font-size: 0.85em;
+	font-size: 0.8em;
 	color: #666;
 `
 
 const FileRes = styled.p`
 	margin: 3px 0;
-	font-size: 0.85em;
+	font-size: 0.8em;
+	color: #666;
+`
+
+const FileSize = styled.p`
+	margin: 3px 0;
+	font-size: 0.8em;
 	color: #666;
 `
 
