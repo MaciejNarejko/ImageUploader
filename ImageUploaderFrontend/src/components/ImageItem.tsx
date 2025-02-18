@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, memo } from 'react'
 import styled from 'styled-components'
 import { ImageData } from '../types/imageTypes'
 
@@ -80,7 +80,7 @@ const ImageItem: React.FC<ImageItemProps> = ({ image, onDownload, onDelete, onIm
 	)
 }
 
-export default ImageItem
+export default memo(ImageItem)
 
 const GalleryItem = styled.div`
 	display: flex;

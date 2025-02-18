@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import axios from 'axios'
 import Layout from './components/Layout'
@@ -8,31 +8,37 @@ import UploadArea from './components/UploadArea'
 import Toast from './components/Toast'
 import { ImageData } from './types/imageTypes'
 import { useFileUpload } from './hooks/useFileUpload'
+import { fetchImages } from './services/imageService'
 
 function App() {
 	const [images, setImages] = useState<ImageData[]>([])
 	const [sortOption, setSortOption] = useState<string>('nameAsc')
 	const [toastMsg, setToastMsg] = useState<string>('')
 	const [selectedImage, setSelectedImage] = useState<ImageData | null>(null)
-
-	useEffect(() => {
-		const API_URL = import.meta.env.VITE_API_URL
-		fetch(`${API_URL}/api/images`)
-			.then(res => {
-				if (!res.ok) {
-					throw new Error('Failed to fetch images')
-				}
-				return res.json()
-			})
-			.then((data: ImageData[]) => setImages(data))
-			.catch(error => {
-				console.error('Error fetching images:', error)
-			})
-	}, [])
+	const toastTimerRef = useRef<number | null>(null)
 
 	const showToast = useCallback((message: string, duration = 3000) => {
+		if (toastTimerRef.current) {
+			clearTimeout(toastTimerRef.current)
+		}
+
 		setToastMsg(message)
-		setTimeout(() => setToastMsg(''), duration)
+		toastTimerRef.current = window.setTimeout(() => {
+			setToastMsg('')
+			toastTimerRef.current = null
+		}, duration)
+	}, [])
+	useEffect(() => {
+		const getImages = async () => {
+			try {
+				const data = await fetchImages()
+				setImages(data)
+			} catch (error) {
+				console.error('Error fetching images:', error)
+			}
+		}
+
+		getImages()
 	}, [])
 
 	const handleFilesUploaded = useCallback((newImages: ImageData[]) => {

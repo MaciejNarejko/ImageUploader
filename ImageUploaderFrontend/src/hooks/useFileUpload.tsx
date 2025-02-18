@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
-import axios from 'axios'
 import { ImageData } from '../types/imageTypes'
+import { uploadImages } from '../services/imageService'
+import { AxiosProgressEvent } from 'axios'
 
 interface UseFileUploadReturn {
 	isUploading: boolean
@@ -14,18 +15,13 @@ interface UseFileUploadProps {
 	existingImages: ImageData[]
 }
 
-export const useFileUpload = ({
-	onFilesUploaded,
-	showToast,
-	existingImages,
-}: UseFileUploadProps): UseFileUploadReturn => {
+export function useFileUpload({ onFilesUploaded, showToast, existingImages }: UseFileUploadProps): UseFileUploadReturn {
 	const [isUploading, setIsUploading] = useState<boolean>(false)
 	const [uploadProgress, setUploadProgress] = useState<number>(0)
 
 	const uploadFiles = useCallback(
 		async (files: File[]) => {
 			const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif']
-
 			for (const file of files) {
 				const fileExtension = file.name.split('.').pop()?.toLowerCase()
 				if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
@@ -57,35 +53,16 @@ export const useFileUpload = ({
 			const formData = new FormData()
 			files.forEach(file => formData.append('files', file))
 
-			const API_URL = import.meta.env.VITE_API_URL
-
 			setIsUploading(true)
 			setUploadProgress(0)
 
 			try {
-				const response = await axios.post(`${API_URL}/api/images/upload`, formData, {
-					headers: {
-						'Content-Type': 'multipart/form-data',
-					},
-					onUploadProgress: progressEvent => {
-						if (progressEvent.total) {
-							const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-							setUploadProgress(progress)
-						}
-					},
+				const newImages = await uploadImages(formData, (progressEvent: AxiosProgressEvent) => {
+					if (progressEvent.total) {
+						const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+						setUploadProgress(progress)
+					}
 				})
-
-				const newImages: ImageData[] = response.data.map((uploadedImage: ImageData) => ({
-					id: uploadedImage.id,
-					fileName: uploadedImage.fileName,
-					filePath: uploadedImage.filePath,
-					uploadDate: uploadedImage.uploadDate || new Date().toISOString(),
-					width: uploadedImage.width,
-					height: uploadedImage.height,
-					fileSize: uploadedImage.fileSize,
-					contentType: uploadedImage.contentType,
-				}))
-
 				onFilesUploaded(newImages)
 				showToast('Pliki zostały przesłane', 3000)
 			} catch (error) {
