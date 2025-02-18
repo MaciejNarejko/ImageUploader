@@ -7,7 +7,7 @@ import ImageModal from './components/ImageModal'
 import UploadArea from './components/UploadArea'
 import Toast from './components/Toast'
 import { ImageData } from './types/imageTypes'
-import { useFileUpload } from './hooks/useFileUpload'
+import { UseFileUpload } from './hooks/useFileUpload'
 import { fetchImages } from './services/imageService'
 
 function App() {
@@ -45,7 +45,7 @@ function App() {
 		setImages(prev => [...prev, ...newImages])
 	}, [])
 
-	const { isUploading, uploadProgress, uploadFiles } = useFileUpload({
+	const { isUploading, uploadProgress, uploadFiles } = UseFileUpload({
 		onFilesUploaded: handleFilesUploaded,
 		showToast,
 		existingImages: images,

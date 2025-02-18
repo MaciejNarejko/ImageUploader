@@ -15,7 +15,7 @@ interface UseFileUploadProps {
 	existingImages: ImageData[]
 }
 
-export function useFileUpload({ onFilesUploaded, showToast, existingImages }: UseFileUploadProps): UseFileUploadReturn {
+export function UseFileUpload({ onFilesUploaded, showToast, existingImages }: UseFileUploadProps): UseFileUploadReturn {
 	const [isUploading, setIsUploading] = useState<boolean>(false)
 	const [uploadProgress, setUploadProgress] = useState<number>(0)
 

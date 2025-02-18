@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, memo } from 'react'
 import styled from 'styled-components'
 import { ImageData } from '../types/imageTypes'
+import { API_URL } from '../apiConfig'
 
 interface ImageItemProps {
 	image: ImageData
@@ -40,11 +41,7 @@ const ImageItem: React.FC<ImageItemProps> = ({ image, onDownload, onDelete, onIm
 
 	return (
 		<GalleryItem>
-			<Thumbnail
-				src={`https://localhost:7124${image.filePath}`}
-				alt={image.fileName}
-				onClick={() => onImageClick(image)}
-			/>
+			<Thumbnail src={`${API_URL}${image.filePath}`} alt={image.fileName} onClick={() => onImageClick(image)} />
 			<FileInfo>
 				<FileName onClick={() => onImageClick(image)}>{image.fileName}</FileName>
 				<FileDate>Uploaded: {new Date(image.uploadDate).toLocaleString()}</FileDate>

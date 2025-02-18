@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { ImageData } from '../types/imageTypes'
 import { useEffect } from 'react'
+import { API_URL } from '../apiConfig'
 
 interface ImageModalProps {
 	image: ImageData
@@ -26,7 +27,7 @@ const ImageModal: React.FC<ImageModalProps> = ({ image, onClose }) => {
 		<ModalOverlay onClick={onClose}>
 			<ModalContent onClick={e => e.stopPropagation()}>
 				<CloseButton onClick={onClose}>×</CloseButton>
-				<ModalImage src={`https://localhost:7124${image.filePath}`} alt={image.fileName} />
+				<ModalImage src={`${API_URL}${image.filePath}`} alt={image.fileName} />
 			</ModalContent>
 		</ModalOverlay>
 	)
