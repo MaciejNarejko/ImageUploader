@@ -22,10 +22,15 @@ export function UseFileUpload({ onFilesUploaded, showToast, existingImages }: Us
 	const uploadFiles = useCallback(
 		async (files: File[]) => {
 			const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif']
+			const maxFileSize = 3145728
 			for (const file of files) {
 				const fileExtension = file.name.split('.').pop()?.toLowerCase()
 				if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
 					showToast('Dopuszczalne formaty plików: JPG, JPEG, PNG, GIF.', 3000)
+					return
+				}
+				if (file.size > maxFileSize) {
+					showToast(`Plik ${file.name} przekracza maksymalny rozmiar 3 MB.`, 3000)
 					return
 				}
 			}

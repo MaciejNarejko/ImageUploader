@@ -113,6 +113,7 @@ const FileName = styled.p`
 	font-size: 0.95em;
 	font-weight: 500;
 	cursor: pointer;
+	word-break: break-all;
 	&:hover {
 		color: #007bff;
 		text-decoration: underline;

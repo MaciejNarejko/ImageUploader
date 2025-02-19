@@ -74,10 +74,10 @@ const CloseButton = styled.button`
 `
 
 const ModalImage = styled.img`
-	height: auto;
+	display: block;
 	width: auto;
-	max-width: 100%;
-	max-height: 100%;
-	object-fit: contain;
+	height: auto;
+	max-width: calc(100vw - 50px);
+	max-height: calc(100vh - 50px);
 	border-radius: 4px;
 `
